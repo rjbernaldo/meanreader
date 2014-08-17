@@ -9,12 +9,13 @@ var passport = require('passport');
 var flash = require('flash');
 var morgan = require('morgan');
 var session = require('session');
-var routes = require('./routes/index');
+var routes = require('./routes/index')(passport);
 
 
 var configDB = require('./config/database.js');
 
 mongoose.connect(configDB.url);
+require('./config/passport')(passport);
 
 var app = express();
 
