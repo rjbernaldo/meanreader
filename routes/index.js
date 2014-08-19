@@ -1,34 +1,42 @@
 var express = require('express');
 var router = express.Router();
-var passport = require('passport');
 
-/* GET home page. */
-router.get('/', function(req, res) {
-  res.render('index', { title: 'Express' });
-});
+module.exports = function(passport) {
+  router.get('/', function(req, res) {
+    res.render('index', { title: 'Express' });
+  });
 
-router.get('/login', function(req, res) {
-  res.render('login', { message: req.flash('loginMessage') });
-});
+  router.get('/login', function(req, res) {
+    res.render('login', { message: req.flash('loginMessage') });
+  });
 
-router.get('/signup', function(req, res) {
-  res.render('signup', { message: req.flash('signupMessage') })
-});
+  router.post('/login', passport.authenticate('local-login', {
+    successRedirect: '/profile',
+    failureRedirect: '/login',
+    failureFlash: true
+  }))
 
-router.post('/signup', passport.authenticate('local-signup', {
-  successRedirect: '/profile',
-  failureRedirect: '/signup',
-  failureFlash: true
-}));
+  router.get('/signup', function(req, res) {
+    res.render('signup', { message: req.flash('signupMessage') })
+  });
 
-router.get('/profile', function(req, res) {
-  res.render('profile', { user: req.user });
-});
+  router.post('/signup', passport.authenticate('local-signup', {
+    successRedirect: '/profile',
+    failureRedirect: '/signup',
+    failureFlash: true
+  }));
 
-router.get('/logout', function(req, res) {
-  req.logout();
-  res.redirect('/');
-});
+  router.get('/profile', function(req, res) {
+    res.render('profile', { user: req.user });
+  });
+
+  router.get('/logout', function(req, res) {
+    req.logout();
+    res.redirect('/');
+  });
+
+  return router;
+}
 
 function isLoggedIn(req, res, next) {
   if (req.isAuthenticated()) {
@@ -37,5 +45,3 @@ function isLoggedIn(req, res, next) {
     res.redirect('/');
   }
 }
-
-module.exports = router;

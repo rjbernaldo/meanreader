@@ -1,3 +1,3 @@
 module.exports = {
-  'url': 'your-settings-here'
+  'url': 'mongodb://localhost:27017/data'
 }
