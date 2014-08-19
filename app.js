@@ -6,11 +6,10 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var passport = require('passport');
-var flash = require('flash');
+var flash = require('connect-flash');
 var morgan = require('morgan');
-var session = require('session');
-var routes = require('./routes/index')(passport);
-
+var session = require('express-session');
+var mongoose = require('mongoose');
 
 var configDB = require('./config/database.js');
 
@@ -34,6 +33,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 
+var routes = require('./routes/index')(passport);
 app.use('/', routes);
 
 app.use(function(req, res, next) {
