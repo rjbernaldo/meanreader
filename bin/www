@@ -2,8 +2,24 @@
 var debug = require('debug')('meanreader');
 var app = require('../app');
 
-app.set('port', process.env.PORT || 3000);
+var server = require('http').Server(app);
+server.listen(process.env.PORT || 3000);
 
-var server = app.listen(app.get('port'), function() {
-  debug('Express server listening on port ' + server.address().port);
+var io = require('socket.io')(server);
+
+var Watcher = require('rss-watcher');
+var watcher = new Watcher('http://podcasts.engadget.com/rss.xml');
+
+watcher.on('new article', function(article) {
+  io.sockets.emit('newMessage', article);
+});
+//
+// watcher.run(function(err, articles) {
+//   if (err)
+//     console.log(err);
+//   console.log(articles);
+// });
+
+watcher.on('stop', function() {
+  console.log('feed stopped.');
 });
