@@ -4,7 +4,13 @@ window.onload = function() {
 function init() {
   var socket = io.connect('/');
 
-  socket.on('newMessage', function(data) {
-    console.log(data);
-  })
+  socket.on('engadget', function(data) {
+    console.log('engadget', data);
+  });
+  socket.on('techcrunch', function(data) {
+    console.log('techcrunch', data);
+  });
+  socket.on('hackernews', function(data) {
+    console.log('hackernews', data);
+  });
 }
