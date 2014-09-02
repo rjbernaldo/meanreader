@@ -5,10 +5,14 @@ function init() {
   var socket = io.connect('/');
 
   socket.on('engadget', function(data) {
-    console.log('engadget', data);
+    data.forEach(function(article) {
+      console.log('engadget', article);
+    });
   });
   socket.on('techcrunch', function(data) {
-    console.log('techcrunch', data);
+    data.forEach(function(article) {
+      console.log('techcrunch', article);
+    });
   });
   socket.on('hackernews', function(data) {
     console.log('hackernews', data);

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 var debug = require('debug')('meanreader');
 var app = require('../app');
+var Article = require('../models/article');
 
 var server = require('http').Server(app);
 server.listen(process.env.PORT || 3000);
@@ -9,28 +10,59 @@ var io = require('socket.io')(server);
 
 var Watcher = require('rss-watcher');
 var feedCollection = [
-  { xml: 'http://podcasts.engadget.com/rss.xml', name: 'engadget' },
   { xml: 'http://feeds.feedburner.com/TechCrunch/', name: 'techcrunch' },
-  { xml: 'http://api.ihackernews.com/page?format=xml', name: 'hackernews' }
-]
-var watchers = []
+  // { xml: 'http://api.ihackernews.com/page', name: 'hackernews' }
+  { xml: 'http://podcasts.engadget.com/rss.xml', name: 'engadget' }
+];
+
+var watchers = [];
 feedCollection.forEach(function(data) {
-  var item = { watcher: new Watcher(data.xml), name: data.name }
+  var item = { watcher: new Watcher(data.xml), name: data.name };
   watchers.push(item);
-})
+});
+
 watchers.forEach(function(data) {
   data.watcher.on('new article', function(article) {
     io.sockets.emit(data.name, article);
+    var article = new Article({
+        author: article.author,
+        categories: article.categories,
+        comments: article.comments,
+        date: article.date,
+        title: article.title,
+        summary: article.summary
+    });
+    article.save(function(err) {
+      if (err)
+        console.log(err);
+      console.log('article saved.');
+    })
   });
 
-  // data.watcher.run(function(err, articles) {
-  //   if (err)
-  //     console.log(err);
-  //   io.sockets.emit(data.name, articles);
-  // });
-
-  data.watcher.on('stop', function() {
-    console.log('feed stopped.');
+  data.watcher.run(function(err, articles) {
+    if (err)
+      console.log(err);
+      
+    articles.forEach(function(article) {
+      var a = Article.findOne({ title: article.title }, function(err, a) {
+        if (a) {
+          console.log('article exists.. not saving to db.');
+        } else {
+          var newarticle = new Article({
+              author: article.author,
+              categories: article.categories,
+              comments: article.comments,
+              date: article.date,
+              title: article.title,
+              summary: article.summary
+          });
+          newarticle.save(function(err) {
+            if (err)
+              console.log(err);
+            console.log('article saved.');
+          });
+        }
+      });
+    });
   });
-  console.log(data);
 });
