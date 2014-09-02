@@ -60,21 +60,6 @@ app.use(function(err, req, res, next) {
     });
 });
 
-var Watcher = require('rss-watcher');
-var watcher = new Watcher('http://podcasts.engadget.com/rss.xml');
-var io = require('socket.io');
-watcher.on('new article', function(article) {
-  io.sockets.emit('newMessage', article);
-});
-//
-// watcher.run(function(err, articles) {
-//   if (err)
-//     console.log(err);
-//   console.log(articles);
-// });
 
-watcher.on('stop', function() {
-  console.log('feed stopped.');
-});
 
 module.exports = app;

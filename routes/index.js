@@ -1,9 +1,13 @@
 var express = require('express');
 var router = express.Router();
+var Article = require('../models/article');
 
 module.exports = function(passport) {
   router.get('/', function(req, res) {
-    res.render('index', { title: 'Express' });
+    var articles = [];
+    Article.find(function(err, as) {
+      res.render('index', { articles: as });
+    });
   });
 
   router.get('/login', function(req, res) {
