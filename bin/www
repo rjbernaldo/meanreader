@@ -2,6 +2,7 @@
 var debug = require('debug')('meanreader');
 var app = require('../app');
 var Article = require('../models/article');
+var htmlparser = require('htmlparser')
 
 var server = require('http').Server(app);
 server.listen(process.env.PORT || 3000);
@@ -11,8 +12,8 @@ var io = require('socket.io')(server);
 var Watcher = require('rss-watcher');
 var feedCollection = [
   { xml: 'http://feeds.feedburner.com/TechCrunch/', name: 'techcrunch' },
-  // { xml: 'http://api.ihackernews.com/page', name: 'hackernews' }
-  { xml: 'http://podcasts.engadget.com/rss.xml', name: 'engadget' }
+  //{ xml: 'http://api.ihackernews.com/page', name: 'hackernews' }
+  { xml: 'http://engadget.com/rss.xml', name: 'engadget' }
 ];
 
 var watchers = [];
@@ -23,39 +24,51 @@ feedCollection.forEach(function(data) {
 
 watchers.forEach(function(data) {
   data.watcher.on('new article', function(article) {
-    io.sockets.emit(data.name, article);
-    var article = new Article({
-        author: article.author,
-        categories: article.categories,
-        comments: article.comments,
-        date: article.date,
-        title: article.title,
-        summary: article.summary
+    var newarticle = new Article({
+        author: article['dc:creator']['#'],
+        title: article['rss:title']['#'],
+        date: article['rss:pubdate']['#']
     });
-    article.save(function(err) {
-      if (err)
-        console.log(err);
-      console.log('article saved.');
-    })
+
+    var handler = new htmlparser.DefaultHandler(function (error, dom) {
+      if (error) {
+        console.log(error);
+      } else {
+        newarticle.image = dom[0].attribs.src;
+        newarticle.description = dom[1].raw;
+      }
+    });
+
+    var parser = new htmlparser.Parser(handler);
+    parser.parseComplete(article['rss:description']['#'])
   });
 
   data.watcher.run(function(err, articles) {
     if (err)
       console.log(err);
-      
+
     articles.forEach(function(article) {
       var a = Article.findOne({ title: article.title }, function(err, a) {
         if (a) {
           console.log('article exists.. not saving to db.');
         } else {
           var newarticle = new Article({
-              author: article.author,
-              categories: article.categories,
-              comments: article.comments,
-              date: article.date,
-              title: article.title,
-              summary: article.summary
+              author: article['dc:creator']['#'],
+              title: article['rss:title']['#'],
+              date: article['rss:pubdate']['#']
           });
+
+          var handler = new htmlparser.DefaultHandler(function (error, dom) {
+            if (error) {
+              console.log(error);
+            } else {
+              newarticle.image = dom[0].attribs.src;
+              newarticle.description = dom[1].raw;
+            }
+          });
+          var parser = new htmlparser.Parser(handler);
+          parser.parseComplete(article['rss:description']['#'])
+
           newarticle.save(function(err) {
             if (err)
               console.log(err);
