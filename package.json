@@ -24,6 +24,7 @@
     "bcrypt-nodejs": "latest",
     "mongoose": "~3.8.0",
     "rss-watcher": "*",
-    "socket.io": "*"
+    "socket.io": "*",
+    "htmlparser": "*"
   }
 }

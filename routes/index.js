@@ -4,18 +4,26 @@ var Article = require('../models/article');
 
 module.exports = function(passport) {
   router.get('/', function(req, res) {
+    if (req.user === undefined) {
+      res.render('home');
+    } else {
+      res.render('home')
+    }
+  });
+
+  router.post('/articles', function(req,res) {
     var articles = [];
     Article.find(function(err, as) {
-      res.render('index', { articles: as });
+      res.end(JSON.stringify(as.reverse()));
     });
-  });
+  })
 
   router.get('/login', function(req, res) {
     res.render('login', { message: req.flash('loginMessage') });
   });
 
   router.post('/login', passport.authenticate('local-login', {
-    successRedirect: '/profile',
+    successRedirect: '/',
     failureRedirect: '/login',
     failureFlash: true
   }))
@@ -25,7 +33,7 @@ module.exports = function(passport) {
   });
 
   router.post('/signup', passport.authenticate('local-signup', {
-    successRedirect: '/profile',
+    successRedirect: '/',
     failureRedirect: '/signup',
     failureFlash: true
   }));
