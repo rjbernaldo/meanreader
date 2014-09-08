@@ -1,11 +1,19 @@
 var LocalStrategy = require('passport-local').Strategy;
+var TwitterStrategy = require('passport-twitter').Strategy;
 var User = require('../models/user');
+
+var configAuth = require('./auth');
 
 module.exports = function(passport) {
   passport.serializeUser(serialize);
   passport.deserializeUser(deserialize);
   passport.use('local-signup', new LocalStrategy({ usernameField: 'email', passwordField: 'password', passReqToCallback: true }, localSignUp));
   passport.use('local-login', new LocalStrategy({ usernameField: 'email', passwordField: 'password', passReqToCallback: true }, localLogin));
+  passport.use(new TwitterStrategy({
+    consumerKey: configAuth.twitterAuth.consumerKey,
+    consumerSecret: configAuth.twitterAuth.consumerSecret,
+    callbackURL: configAuth.twitterAuth.callbackURL
+  }, twitterAuth));
 }
 
 function serialize(user, done) {
@@ -54,5 +62,31 @@ function localLogin(req, email, password, done) {
     }
 
     return done(null, user);
+  });
+}
+
+function twitterAuth(token, tokenSecret, profile, done) {
+  process.nextTick(function() {
+    User.findOne({ 'twitter.id': profile.id }, function(err, user) {
+      if (err)
+        return done(err);
+
+      if (user) {
+        return done(null, user);
+      } else {
+        var newUser = new User();
+        newUser.twitter.id = profile.id;
+        newUser.twitter.token = token;
+        newUser.twitter.username = profile.username;
+        newUser.twitter.displayName = profile.displayName;
+
+        newUser.save(function(err) {
+          if (err)
+            throw err;
+
+          return done(null, newUser);
+        });
+      }
+    });
   });
 }

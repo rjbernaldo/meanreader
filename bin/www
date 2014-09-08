@@ -62,7 +62,8 @@ watchers.forEach(function(data) {
             if (error) {
               console.log(error);
             } else {
-              newarticle.image = dom[0].attribs.src;
+              if (dom[0].attribs != undefined)
+                newarticle.image = dom[0].attribs.src;
               newarticle.description = dom[1].raw;
             }
           });

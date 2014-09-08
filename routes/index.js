@@ -5,7 +5,7 @@ var Article = require('../models/article');
 module.exports = function(passport) {
   router.get('/', function(req, res) {
     if (req.user === undefined) {
-      res.render('home');
+      res.render('index');
     } else {
       res.render('home')
     }
@@ -46,6 +46,13 @@ module.exports = function(passport) {
     req.logout();
     res.redirect('/');
   });
+
+  router.get('/auth/twitter', passport.authenticate('twitter'));
+
+  router.get('/auth/twitter/callback', passport.authenticate('twitter', {
+    successRedirect: '/',
+    failureRedirect: '/'
+  }))
 
   return router;
 }
