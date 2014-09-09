@@ -3,42 +3,17 @@ var router = express.Router();
 var Article = require('../models/article');
 
 module.exports = function(passport) {
-  router.get('/', function(req, res) {
-    if (req.user === undefined) {
-      res.render('index');
-    } else {
-      res.render('home')
-    }
+  router.get('/', isLoggedIn, function(req, res) {
+    res.render('home');
   });
 
   router.post('/articles', function(req,res) {
-    var articles = [];
     Article.find(function(err, as) {
       res.end(JSON.stringify(as.reverse()));
     });
   })
 
-  router.get('/login', function(req, res) {
-    res.render('login', { message: req.flash('loginMessage') });
-  });
-
-  router.post('/login', passport.authenticate('local-login', {
-    successRedirect: '/',
-    failureRedirect: '/login',
-    failureFlash: true
-  }))
-
-  router.get('/signup', function(req, res) {
-    res.render('signup', { message: req.flash('signupMessage') })
-  });
-
-  router.post('/signup', passport.authenticate('local-signup', {
-    successRedirect: '/',
-    failureRedirect: '/signup',
-    failureFlash: true
-  }));
-
-  router.get('/profile', function(req, res) {
+  router.get('/profile', isLoggedIn, function(req, res) {
     res.render('profile', { user: req.user });
   });
 
@@ -50,9 +25,9 @@ module.exports = function(passport) {
   router.get('/auth/twitter', passport.authenticate('twitter'));
 
   router.get('/auth/twitter/callback', passport.authenticate('twitter', {
-    successRedirect: '/',
-    failureRedirect: '/'
-  }))
+    failureRedirect: '/',
+    successRedirect: '/'
+  }));
 
   return router;
 }
@@ -61,6 +36,6 @@ function isLoggedIn(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
   } else {
-    res.redirect('/');
+    res.render('index');
   }
 }

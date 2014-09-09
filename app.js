@@ -23,18 +23,18 @@ app.set('view engine', 'ejs');
 
 app.use(favicon());
 app.use(logger('dev'));
+app.use(cookieParser());
+app.use(session({ secret: 'test' }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(session({ secret: 'test '}));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 
 var routes = require('./routes/index')(passport);
-app.use('/', routes);
+app.use(routes);
 
 app.use(function(req, res, next) {
     var err = new Error('Not Found');

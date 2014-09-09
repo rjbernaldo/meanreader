@@ -13,11 +13,53 @@
 <div class="container">
   <div id="main"></div>
 
+  <script type="text/javascript" src="thirdparty/oboe-browser.min.js"></script>
   <script type="text/javascript" src="thirdparty/react.js"></script>
   <script type="text/javascript" src="//code.jquery.com/jquery-2.1.1.min.js"></script>
   <script type="text/javascript" src="javascripts/react/article.react.js"></script>
   <script type="text/javascript" src="javascripts/react/articlelist.react.js"></script>
   <script type="text/javascript" src="javascripts/react/articleapp.react.js"></script>
+  <script>
+    // var stream = $.getJSON('https://userstream.twitter.com/1.1/user.json&callback=?', {
+    //   user_id: '49103596',
+    //   count: '5'
+    // });
+    // stream.done(function(data) {
+    //   console.log('STREAM', data);
+    // });
+    window.onload = function() {
+      oboe({
+        url: '//api.twitter.com/1.1/statuses/home_timeline.json?callback=?',
+        method: 'GET',
+        headers: {
+          'Conent-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+        },
+        withCredentials: true
+      })
+      .node('*', function(data) {
+        console.log(data);
+      })
+      .done(function(data) {
+        console.log('END');
+      })
+      // $.ajax({
+      //      url : "http://api.twitter.com/1.1/statuses/home_timeline.json?count=200&callback=?",
+      //      dataType : "json",
+      //      timeout:15000,
+      //
+      //      success : function(data)
+      //      {
+      //            console.log(data);
+      //      },
+      //
+      //      error : function()
+      //      {
+      //          alert("Failure!");
+      //      },
+      //
+      //  });
+    }
+  </script>
 </div>
 </body>
 </html>
