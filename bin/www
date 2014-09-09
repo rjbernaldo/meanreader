@@ -11,9 +11,9 @@ var io = require('socket.io')(server);
 
 var Watcher = require('rss-watcher');
 var feedCollection = [
-  { xml: 'http://feeds.feedburner.com/TechCrunch/', name: 'techcrunch' },
+  // { xml: 'http://feeds.feedburner.com/TechCrunch/', name: 'techcrunch' },
   //{ xml: 'http://api.ihackernews.com/page', name: 'hackernews' }
-  { xml: 'http://engadget.com/rss.xml', name: 'engadget' }
+  // { xml: 'http://engadget.com/rss.xml', name: 'engadget' }
 ];
 
 var watchers = [];
