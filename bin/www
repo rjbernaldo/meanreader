@@ -2,81 +2,96 @@
 var debug = require('debug')('meanreader');
 var app = require('../app');
 var Article = require('../models/article');
-var htmlparser = require('htmlparser')
+var Twitter = require('ntwitter')
 
 var server = require('http').Server(app);
 server.listen(process.env.PORT || 3000);
 
 var io = require('socket.io')(server);
 
-var Watcher = require('rss-watcher');
-var feedCollection = [
-  // { xml: 'http://feeds.feedburner.com/TechCrunch/', name: 'techcrunch' },
-  //{ xml: 'http://api.ihackernews.com/page', name: 'hackernews' }
-  // { xml: 'http://engadget.com/rss.xml', name: 'engadget' }
+var configAuth = require('../config/auth');
+
+var t = new Twitter({
+  consumer_key: configAuth.twitterAuth.consumerKey,
+  consumer_secret: configAuth.twitterAuth.consumerSecret,
+  access_token_key: configAuth.twitterAuth.accessToken,
+  access_token_secret: configAuth.twitterAuth.accessTokenSecret
+});
+
+var following = [
+  '816653',
+  '14372486'
 ];
 
-var watchers = [];
-feedCollection.forEach(function(data) {
-  var item = { watcher: new Watcher(data.xml), name: data.name };
-  watchers.push(item);
-});
-
-watchers.forEach(function(data) {
-  data.watcher.on('new article', function(article) {
-    var newarticle = new Article({
-        author: article['dc:creator']['#'],
-        title: article['rss:title']['#'],
-        date: article['rss:pubdate']['#']
-    });
-
-    var handler = new htmlparser.DefaultHandler(function (error, dom) {
-      if (error) {
-        console.log(error);
-      } else {
-        newarticle.image = dom[0].attribs.src;
-        newarticle.description = dom[1].raw;
+function runStream(count) {
+  t.stream('statuses/filter', { 'follow': following.join(',') }, function(stream) {
+    stream.on('data', function(data) {
+      var length = following.length;
+      console.log(length)
+      if (length > count) {
+        console.log('destroying stream');
+        this.destroy();
+        runStream(following.length);
       }
-    });
+      if (following.indexOf(data.user.id_str) !== -1) {
+        console.log(data)
+        var links = data.entities.urls;
+        var hashtags = data.entities.hashtags;
+        var articleId = data.id_str;
 
-    var parser = new htmlparser.Parser(handler);
-    parser.parseComplete(article['rss:description']['#'])
-  });
-
-  data.watcher.run(function(err, articles) {
-    if (err)
-      console.log(err);
-
-    articles.forEach(function(article) {
-      var a = Article.findOne({ title: article.title }, function(err, a) {
-        if (a) {
-          console.log('article exists.. not saving to db.');
-        } else {
-          var newarticle = new Article({
-              author: article['dc:creator']['#'],
-              title: article['rss:title']['#'],
-              date: article['rss:pubdate']['#']
-          });
-
-          var handler = new htmlparser.DefaultHandler(function (error, dom) {
-            if (error) {
-              console.log(error);
-            } else {
-              if (dom[0].attribs != undefined)
-                newarticle.image = dom[0].attribs.src;
-              newarticle.description = dom[1].raw;
-            }
-          });
-          var parser = new htmlparser.Parser(handler);
-          parser.parseComplete(article['rss:description']['#'])
-
-          newarticle.save(function(err) {
-            if (err)
-              console.log(err);
-            console.log('article saved.');
-          });
-        }
-      });
+        var created_at = data.created_at;
+        var title = data.text;
+        var sourceName = data.user.name;
+        var sourceBGImg = data.user.profile_background_image_url;
+        var sourceProfileImg = data.user.profile_image_url;
+        var sourceBGColor = data.user.profile_background_color;
+      }
+      console.log(data.text);
     });
   });
-});
+}
+
+runStream(following.length);
+
+setTimeout(function(){
+  following.push('2890961');
+  following.push('7144422');
+}, 5000);
+//
+//   data.watcher.run(function(err, articles) {
+//     if (err)
+//       console.log(err);
+//
+//     articles.forEach(function(article) {
+//       var a = Article.findOne({ title: article.title }, function(err, a) {
+//         if (a) {
+//           console.log('article exists.. not saving to db.');
+//         } else {
+//           var newarticle = new Article({
+//               author: article['dc:creator']['#'],
+//               title: article['rss:title']['#'],
+//               date: article['rss:pubdate']['#']
+//           });
+//
+//           var handler = new htmlparser.DefaultHandler(function (error, dom) {
+//             if (error) {
+//               console.log(error);
+//             } else {
+//               if (dom[0].attribs != undefined)
+//                 newarticle.image = dom[0].attribs.src;
+//               newarticle.description = dom[1].raw;
+//             }
+//           });
+//           var parser = new htmlparser.Parser(handler);
+//           parser.parseComplete(article['rss:description']['#'])
+//
+//           newarticle.save(function(err) {
+//             if (err)
+//               console.log(err);
+//             console.log('article saved.');
+//           });
+//         }
+//       });
+//     });
+//   });
+// });

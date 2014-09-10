@@ -4,10 +4,15 @@ var Article = require('../models/article');
 
 module.exports = function(passport) {
   router.get('/', isLoggedIn, function(req, res) {
-    res.render('home');
+    res.render('home', { user: req.user });
   });
 
-  router.post('/articles', function(req,res) {
+  router.post('/user', function(req, res) {
+    if (req.user)
+      res.end(JSON.stringify(req.user));
+  })
+
+  router.post('/articles', function(req, res) {
     Article.find(function(err, as) {
       res.end(JSON.stringify(as.reverse()));
     });
