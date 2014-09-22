@@ -24,7 +24,7 @@ app.set('view engine', 'ejs');
 app.use(favicon());
 app.use(logger('dev'));
 app.use(cookieParser());
-app.use(session({ secret: '0123' }));
+app.use(session({ secret: '012345' }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(express.static(path.join(__dirname, 'public')));
