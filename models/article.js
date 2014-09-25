@@ -9,5 +9,4 @@ var articleSchema = mongoose.Schema({
   source: String
 });
 
-
 module.exports = mongoose.model('Article', articleSchema);
