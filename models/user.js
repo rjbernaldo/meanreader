@@ -8,6 +8,7 @@ var userSchema = mongoose.Schema({
     tokenSecret: String,
     displayName: String,
     username: String
+    
   }
 });
 
