@@ -7,7 +7,6 @@ var articleSchema = mongoose.Schema({
   date: String,
   image: String,
   source: String
-  
 });
 
 module.exports = mongoose.model('Article', articleSchema);
