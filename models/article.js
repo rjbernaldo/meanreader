@@ -5,8 +5,8 @@ var articleSchema = mongoose.Schema({
   title: String,
   description: String,
   date: String,
-  source: String,
-  image: String
+  image: String,
+  source: String
 });
 
 module.exports = mongoose.model('Article', articleSchema);
