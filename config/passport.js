@@ -21,6 +21,7 @@ function deserialize(id, done) {
   User.findById(id, function(err, user) {
     if (err)
       done(err, null);
+      
     done(err, user);
   });
 }
