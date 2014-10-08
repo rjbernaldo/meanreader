@@ -7,8 +7,8 @@ module.exports = function(passport) {
   passport.serializeUser(serialize);
   passport.deserializeUser(deserialize);
   passport.use(new TwitterStrategy({
-    consumerKey: configAuth.twitterAuth.consumerKey,
     consumerSecret: configAuth.twitterAuth.consumerSecret,
+    consumerKey: configAuth.twitterAuth.consumerKey,
     callbackURL: configAuth.twitterAuth.callbackURL
   }, twitterAuth));
 }
