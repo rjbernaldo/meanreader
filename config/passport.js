@@ -9,6 +9,7 @@ module.exports = function(passport) {
   passport.use(new TwitterStrategy({
     consumerSecret: configAuth.twitterAuth.consumerSecret,
     consumerKey: configAuth.twitterAuth.consumerKey,
+
     callbackURL: configAuth.twitterAuth.callbackURL
   }, twitterAuth));
 }
