@@ -6,5 +6,6 @@ module.exports = {
     'accessToken': '2798340624-daJn9ajfvVtTb9jzvtBYXlRLSY1c5HaJB0rtzYx'
     'callbackURL': '/auth/twitter/callback'
   }
+
   
 }
