@@ -11,7 +11,7 @@ var morgan = require('morgan');
 var session = require('express-session');
 var mongoose = require('mongoose');
 
-var configDB = require('./config/database.js');
+var configDB = require('./config/db.js');
 
 mongoose.connect(configDB.url);
 require('./config/passport')(passport);
