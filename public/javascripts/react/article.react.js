@@ -2,6 +2,7 @@
 
 var Article = React.createClass({displayName: 'Article',
   getInitialState: function() {
+    
     return { date: this.timeSince(this.props.data.date) }
   },
   timeSince: function(d) {
@@ -183,14 +184,14 @@ var Article = React.createClass({displayName: 'Article',
       height: '17px'
     }
     return (
-      React.DOM.div({style: mainStyle }, 
-        React.DOM.div({style: timeStyle },  this.state.date, " ago"), 
-        React.DOM.div({style: timeBar }), 
-        React.DOM.div({className: "article"}, 
-          React.DOM.div({style: imgStyle }), 
-          React.DOM.div({style: articleStyle }, 
-            React.DOM.h1({style: h1Style },  this.props.data.title.replace("'", "") ), 
-            React.DOM.p(null,  this.props.data.author), 
+      React.DOM.div({style: mainStyle },
+        React.DOM.div({style: timeStyle },  this.state.date, " ago"),
+        React.DOM.div({style: timeBar }),
+        React.DOM.div({className: "article"},
+          React.DOM.div({style: imgStyle }),
+          React.DOM.div({style: articleStyle },
+            React.DOM.h1({style: h1Style },  this.props.data.title.replace("'", "") ),
+            React.DOM.p(null,  this.props.data.author),
             React.DOM.p(null,  this.props.data.description)
           )
         )
